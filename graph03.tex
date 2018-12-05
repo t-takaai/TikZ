@@ -1,0 +1,17 @@
+\documentclass[dvipdfmx]{jsarticle}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{intersections, calc}
+\begin{document}
+
+\begin{tikzpicture}[ > = latex']
+
+\node(O) at (0,0) [below left]{$\mathrm{O}$};
+\draw[->] (-1,0) -- (3,0) node[below]{$x$};
+\draw[->] (0,-1) -- (0,2.5) node[left]{$y$};
+
+\draw(1,0) circle(1cm);
+\node[draw, circle, thick, fill=black, minimum size=0.5mm, inner sep=0, label=270:$a$] at (1,0) {};
+\end{tikzpicture}
+
+\end{document}

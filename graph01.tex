@@ -1,0 +1,25 @@
+\documentclass[dvipdfmx]{jsarticle}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\pgfplotsset{compat=1.12}
+
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}[axis lines=center]
+\addplot[samples=200,domain=-2:2]{x^3 - x};
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{axis}[axis lines=center,title=グラフ,xlabel=$x$,ylabel=$y$,legend pos=outer north east, >=latex']
+\addplot[samples=200,domain=-2:2]{x^3};
+\addlegendentry{$y = x^3$}
+\addplot[dashed,samples=200,domain=-2:2]{x^2};
+\addlegendentry{$y = x^2$}
+\end{axis}
+\end{tikzpicture}
+
+
+\end{document}

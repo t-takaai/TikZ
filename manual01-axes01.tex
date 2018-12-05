@@ -1,0 +1,15 @@
+﻿\begin{tikzpicture}
+ \datavisualization[
+ school book axes,
+ x axis={label={$x$}, ticks={major={at={}}}},
+ y axis={label={$y$}, ticks={major={at={}}}},
+ ]
+ data{
+ x,y
+ -2.5, -2.5
+ 2.5, 2.5  
+ };
+  \begin{scope}
+   \draw (0,0) node[below left]{O}; % 原点
+  \end{scope}
+\end{tikzpicture}

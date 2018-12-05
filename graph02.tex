@@ -1,0 +1,27 @@
+\documentclass[dvipdfmx]{jsarticle}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{intersections, calc}
+\begin{document}
+\begin{tikzpicture}[x=2cm,y=2cm,>=latex']
+
+\def\tangentlength{6cm};
+
+\node(O) at (0,0) [below left]{$\mathrm{O}$};
+\draw[->] (-0.2,0) -- (4.2,0) node[below]{$x$};
+\draw[->] (0,-0.2) -- (0,2.6) node[left]{$y$};
+
+\draw[name path=graph] (0,0) .. controls (2,0) and (2,2) .. (4,2);
+
+\path[name path=main] (2.8,0) -- (2.8,2);
+\path[name path=sub] ($(2.8,0)+(1pt,0)$) -- ($(2.8,2)+(1pt,0)$);
+\path[name intersections={of=graph and main}];
+\coordinate (a) at (intersection-1);
+\path[name intersections={of=graph and sub}];
+\coordinate (b) at (intersection-1);
+\draw[thick] ($(a)!-\tangentlength/2!(b)$)--($(a)!\tangentlength/2!(b)$);
+
+\draw[dashed,help lines] ($(0,0)!(a)!(0,1)$)-| ($(0,0)!(a)!(1,0)$);
+
+\end{tikzpicture}
+\end{document}

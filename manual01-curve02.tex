@@ -1,0 +1,25 @@
+﻿\begin{tikzpicture}[scale = 1.8]
+ \datavisualization[
+ school book axes,
+ x axis={label={$x$},ticks={major={at={}}}},
+ y axis={label={$y$},ticks={major={at={}}}},
+ ]
+ data{
+ x,y
+ - .5, - .5
+ 2, 1.5
+ };
+  \begin{scope}
+   \draw (0,0) node[above left]{O};
+
+   \draw[thick, domain=-0:pi/2] plot (\x,{(2/pi) * \x}) node at(2,1.2) {$y = \dfrac{2}{\pi}x$};
+   % \draw[thick, domain=-2.2:2.2,smooth] plot (\x,{\x * \x - 2}) node at(2,3.2) {$y = x^2 -  2$};
+
+   \draw[thick] (0, 0) sin (pi/2,1);
+
+   \draw[thin,dashed](pi/2,0) node [below]{$\dfrac{\pi}{2}$}--(pi/2,1);
+   \draw[thin,dashed](0,1) node [left]{$1$}--(pi/2,1);
+
+   % \draw (0, -2) node [below left]{$ -2$};
+  \end{scope}
+\end{tikzpicture}

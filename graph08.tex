@@ -1,0 +1,22 @@
+\documentclass[dvipdfmx]{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}
+ \node at (0,0) [below right] {$O$};%nowadays, $O$ should be $\mathrm{O}$
+
+ \draw[->] (-3,0) -- (5,0) node[right] {$x$};
+ \node at (1,0) [below right] {$1$};
+
+ \draw[->] (0,-3) -- (0,5) node[above] {$y$};
+ \node at (0,1) [above left] {$1$};
+
+ \draw[dashed] (-2.5,-2.5) -- (4.5, 4.5);
+
+ \draw[domain=-3:{ln(5)},samples=200,smooth] plot (\x, {exp(\x)});
+ 
+ \node at (1.25,{exp(1.25)}) [left] {$y = a^{x}$};
+
+ \draw[domain={exp(-3)}:5,samples=200,smooth] plot (\x, {ln(\x)});
+ \node at (3,{ln(3)}) [below right] {$y = \log_{a}x$};
+\end{tikzpicture}.
+\end{document}

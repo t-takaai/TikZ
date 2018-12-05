@@ -1,0 +1,417 @@
+\documentclass[11pt]{jsarticle}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage[dvipdfmx]{graphicx}
+%\usepackage{eclbkbox}
+% \usepackage{listings}
+\usepackage{verbatim}
+\usepackage{ascmac}
+\usepackage[dvipdfmx,svgnames]{xcolor}%tikzパッケージよりも前に読み込みます。%
+\usepackage{tikz}
+% \usepackage{siunitx}
+
+\usetikzlibrary{arrows}
+\usetikzlibrary{intersections, calc}
+\usetikzlibrary{patterns}
+% \usetikzlibrary{arrows.meta}
+\usetikzlibrary{datavisualization}
+\usetikzlibrary{intersections,calc}%交点を求める，座標計算
+\usetikzlibrary{angles}
+
+
+\title{Tikz サンプル}
+\author{鷹合孝之}
+
+\begin{document}
+
+\maketitle
+
+\everymath{\displaystyle}
+
+\section{はじめに}
+\subsection{各図形の書式についての簡単な説明}
+
+\begin{enumerate}
+  \item 方眼の書式
+  \begin{itemize}
+    \item 方眼は \textbackslash draw (左下隅) grid (右上隅);
+      \begin{itemize}
+        \item オプションの[help lines]によって，方眼がグレーの細線になる
+        \item さらに[step = 5mm]などとして方眼の間隔を設定できる（デフォルトでは1cm）
+      \end{itemize}
+  \end{itemize}       
+  \item 直線の書式
+    \begin{itemize}
+     \item 線分は\textbackslash draw (始点) -- (中間点) … -- (終点);
+           \begin{itemize}
+            \item 点と点のあいだの--は「ハイフン2個」
+            \item パスを閉じるときは最後に --cycle をつける（このオプションで始点に戻ることになる）
+            \item 滑らかな角にするにはその手前で [rounded corners] -- とする
+            \item 再び直線的な角にするにはその手前で [sharp corners] -- とする
+            \item (終点) の座標を極座標形式 (角度:長さ)で表現することもでき，++をつければ始点からの相対座標となる（なければ絶対座標）
+
+           \end{itemize}
+     \item 長方形は \textbackslash draw (左下隅) rectangle (右上隅);
+     \item タテ・ヨコだけで結ぶ線は \textbackslash draw (始点) |- (終点); または
+           \textbackslash draw (始点) -| (終点);
+           \begin{itemize}
+            \item "--"が (始点) と (終点)をまっすぐに結ぶのに対し，|-は「始めにタテ，次にヨコ」で2点を
+                  結び，-|は「始めにヨコ，次にタテ」で2点を結ぶ
+           \end{itemize}
+    \end{itemize}
+ \item 円，楕円，弧（扇形）の書式
+       \begin{itemize}
+        \item 円は \textbackslash draw (中心) circle [radius=r];
+       \begin{itemize}
+        \item 古い仕様では，半径を(r)とつけることになっていたが，可読性の観点から座標以外を
+               ( )で囲むことは現在は推奨されていない
+        \item 座標上の「点」を黒丸で示すときには旧形式の表記がよく用いられる
+              （\textbackslash fill (中心) circle (2pt);）
+       \end{itemize}
+        \item 楕円は \textbackslash draw (中心) circle [x radius = x方向の径, y radius = y方向の径,
+              rotate = 回転角];
+              \begin{itemize}
+               \item 回転角はラジアン（弧度法）ではなく，度数法（1回
+                     転が360度となるもの）で表す
+              \end{itemize}
+        \item 弧は \textbackslash draw (始点) arc
+              [start angle = 始点の角度, end angle = 終点の角度, radius = 半径];
+              \begin{itemize}
+        \item 角度はラジアン（弧度法）ではなく，度数法（1回転が360度となるもの）で表す
+        \item 略式では \textbackslash draw (始点) arc (始点の角度:終点の
+              角度:半径); とすることもできる
+        \item 始点の角度または終点の角度の一方の代わりに delta angle = 中心角 を設定することもできる
+        \item radius の代わりに x radius と y radius に異なった長さを設定すれば楕円の弧の一部になる
+              \end{itemize}
+       \end{itemize}
+
+ \item 放物線，サインカーブ，曲線，ベジェ曲線の書式
+       \begin{itemize}
+        \item 放物線は \textbackslash draw (始点) parabola bend (頂点) (終点);
+              \begin{itemize}
+               \item ただし，上の式は「始点から頂点までの放物線」と「頂点から終点までの放物線」を表し，
+                     必ずしも3点を通る1つの放物線になるとは限らない
+                     （同一放物線にするには，適切な座標を記述者自身が与えなくてはならない）
+               \item \textbackslash draw (始点) parabola (終点); と2点のみを与えた場合は始点が頂点，
+                     \textbackslash draw (始点) parabola [bend at end] (終点)とした場合は終点が頂点になる
+               \item \textbackslash draw (始点) parabola [parabola height = 高さ] +(幅,0);
+              \end{itemize}
+        \item サインカーブは \textbackslash draw (始点) sin (頂点); または \textbackslash draw (頂点) cos (終点);
+              \begin{itemize}
+               \item sinを用いれば「原点から頂点まで」の1/4周期を描き，cosを用いれば
+                     「頂点から原点まで」の1/4周期を描く（いずれも[0, π/2]の範囲ということ）
+               \item 三角関数の1周期分を記述するには，sin と cos を適切に組み合わせる
+               \item sin および cos で描かれるのは三角関数の1/4周期分のみ
+              \end{itemize}
+        \item 曲線として \textbackslash draw (始点) to [out = 始点から出る角度, in = 終点に入る角度] (終点);
+              \begin{itemize}
+               \item 2点の「出」と「入り」の角度を指定し，滑らかな曲線でつなぐ
+               \item {[out = ○, in = ○]} というオプションがなければ，
+                     上式は \textbackslash draw (始点) -- (終点); に等しい
+              \end{itemize}
+        \item {[bend 方向 (= 角度）, distance = 距離]} というオプションで2点間を緩やかに膨らんだ曲線で結ぶ
+              \begin{itemize}
+               \item 方向は（進行方向に対して） left または right
+               \item 角度を指定すると [out = 角度, in = 180 - 角度 ] を意味する
+               \item 角度を省略すると，以前の数値が機械的に使われる
+               \item distance で膨らみ具合を調整できる（ベジェ曲線の controls の距離を調整している）
+              \end{itemize}
+        \item ベジェ曲線は \textbackslash draw (始点) .. controls (方向点1) and (方向点2) .. (終点);
+              \begin{itemize}
+               \item 3次のベジェ曲線になる
+               \item 方向点2を省略すると，方向点2と終点が一致していると見なされて描画される
+              \end{itemize}
+       \end{itemize}
+ \item 関数による描画
+       \begin{itemize}
+        \item 座標指定の y 座標が x 座標（\textbackslash x）の関数になるように記述する
+              \begin{itemize}
+               \item デフォルトの変数は \textbackslash x だが，
+                     オプションで variable = \textbackslash t などとすれば変えられる
+               \item 変域のデフォルトは[-5:5]だが，オプションで domain = <start>:<end> と指定できる
+               \item 必要に応じて中括弧（{, }）を使用する
+              \end{itemize}
+        \item ここでは PGF (TikZ) の計算機能を利用している（gnuplot などの外部エンジンの利用も可能）
+              \begin{itemize}
+               \item 使用可能な PGF の計算機能についてはマニュアルの第89章 Mathematical Expressions を参照
+              \end{itemize}
+       \end{itemize}
+\end{enumerate}
+
+\newpage
+
+\section{例}
+
+\subsection{座標軸}
+
+\begin{minipage}[t]{0.5\textwidth}
+ % \vspace{0zw}
+  \begin{itembox}[l]{LaTeX}
+ {\scriptsize
+    \verbatiminput{manual01-axes01.tex}
+ }
+ \end{itembox}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+ \vspace{0zw}
+  \begin{center}
+   \input{manual01-axes01.tex}
+  \end{center}
+\end{minipage}
+
+\begin{minipage}[t]{0.5\textwidth}
+ % \vspace{0zw}
+  \begin{itembox}[l]{LaTeX}
+ {\scriptsize
+    \verbatiminput{manual01-axes02.tex}
+ }
+ \end{itembox}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+ \vspace{0zw}
+  \begin{center}
+   \input{manual01-axes02.tex}
+  \end{center}
+\end{minipage}
+\newpage
+
+\subsection{曲線}
+
+% \begin{minipage}[t]{0.5\textwidth}
+ % \vspace{0zw}
+  \begin{itembox}[l]{LaTeX}
+ {\scriptsize
+    \verbatiminput{manual01-curve01.tex}
+ }
+ \end{itembox}
+% \end{minipage}
+% \begin{minipage}[t]{0.5\textwidth}
+%  \vspace{0zw}
+  \begin{center}
+   \input{manual01-curve01.tex}
+  \end{center}
+% \end{minipage}
+
+% \begin{minipage}[t]{0.5\textwidth}
+ % \vspace{0zw}
+  \begin{itembox}[l]{LaTeX}
+ {\scriptsize
+    \verbatiminput{manual01-curve02.tex}
+ }
+ \end{itembox}
+% \end{minipage}
+% \begin{minipage}[t]{0.5\textwidth}
+%  \vspace{0zw}
+  \begin{center}
+   \input{manual01-curve02.tex}
+  \end{center}
+% \end{minipage}
+
+\subsection{領域}
+
+
+% \begin{minipage}[t]{0.5\textwidth}
+ % \vspace{0zw}
+  \begin{itembox}[l]{LaTeX}
+ {\scriptsize
+    \verbatiminput{manual01-area01.tex}
+ }
+ \end{itembox}
+% \end{minipage}
+% \begin{minipage}[t]{0.5\textwidth}
+%  \vspace{0zw}
+  \begin{center}
+   \input{manual01-area01.tex}
+  \end{center}
+% \end{minipage}
+
+\newpage
+
+% \begin{minipage}[t]{0.5\textwidth}
+%  \vspace{0zw}
+  \begin{itembox}[l]{LaTeX}
+ {\scriptsize
+    \verbatiminput{manual01-area02.tex}
+ }
+ \end{itembox}
+% \end{minipage}
+% \begin{minipage}[t]{0.5\textwidth}
+%  \vspace{0zw}
+  \begin{center}
+   \input{manual01-area02.tex}
+  \end{center}
+% \end{minipage}
+
+\newpage
+
+\subsection{図形}
+
+\begin{tikzpicture}
+\path
+ (0,0,0)  coordinate [label=left:$\mathrm{E}$]  (E)
+ (2,0,0)  coordinate [label=right:$\mathrm{F}$] (F)
+ (2,2,0)  coordinate [label=right:$\mathrm{B}$] (B)
+ (0,2,0)  coordinate [label=left:$\mathrm{A}$]  (A)
+ (0,0,-2) coordinate [label=left:$\mathrm{H}$]  (H)
+ (2,0,-2) coordinate [label=right:$\mathrm{G}$] (G)
+ (2,2,-2) coordinate [label=right:$\mathrm{C}$] (C)
+ (0,2,-2) coordinate [label=left:$\mathrm{D}$]  (D)
+;
+
+\draw
+   (A) -- (B)
+       -- (C)
+       -- (D) -- cycle
+   (E) -- (F)
+       -- (G)
+       -- (H) -- cycle
+   (A) -- (E)
+   (B) -- (F)
+   (C) -- (G)
+   (D) -- (H)
+;
+\end{tikzpicture}
+
+
+
+\newpage
+
+
+
+
+%%%角度記号\angmark{A}{O}{B}{角度}
+\newcommand{\angmark}[4]{
+ \coordinate(Aang)at($(#1)-(#2)$);
+ \coordinate(Bang)at($(#3)-(#2)$);
+ \draw let \p1=(Aang), \p2=(Bang)
+ in ($(#2)!0.5cm!(#1)$) arc
+ [start angle={atan2(\x1,\y1)}, end angle={atan2(\x2,\y2)}, radius=0.5cm];
+ \draw [opacity=0]
+ let \p1=(Aang), \p2=(Bang),
+ \n1={atan2(\x1,\y1)}, \n2={atan2(\x2,\y2)}, \n3={0.5*\n1+0.5*\n2}
+ in ($(#2)!.8cm!(#1)$)
+ arc [start angle={\n1}, end angle={\n3}, radius=.8cm]
+ coordinate(Cang);
+\draw(Cang)node{#4};}
+
+
+
+
+\begin{tikzpicture}
+\coordinate(O)at(0,0)node[above]at(O){O};
+\coordinate(A)at(3,-4)node[right]at(A){A};
+\coordinate(B)at(-5,-2)node[left]at(B){B};
+\draw(A)--(O)--(B);
+\angmark{B}{O}{A}{$\theta$}
+\end{tikzpicture}
+
+
+%%%180°を跨ぐ角度記号\contrangmark{A}{O}{B}{角度}
+\newcommand{\contrangmark}[4]{
+ \coordinate(Aang)at($(#1)-(#2)$);
+ \coordinate(Bang)at($(#3)-(#2)$);
+ \draw
+ let \p1=(Aang), \p2=(Bang),
+ \n1={atan2(\x1,\y1)}, \n2={atan2(\x2,\y2)+360}
+ in ($(#2)!0.5cm!(#1)$)
+ arc [start angle={\n1}, end angle={\n2}, radius=0.5cm];
+ \draw[opacity=0]
+ let \p1=(Aang), \p2=(Bang),
+ \n1={atan2(\x1,\y1)}, \n2={atan2(\x2,\y2)+360},
+ \n3={0.5*\n1+0.5*\n2}
+ in ($(#2)!.8cm!(#1)$)
+ arc [start angle={\n1}, end angle={\n3}, radius=.8cm]
+ coordinate(Cang);
+ \draw(Cang)node{#4};}
+
+ \newcommand{\ang}[1]{#1^\circ}
+
+ \begin{tikzpicture}
+\coordinate(O)at(0,0);
+\fill(O)circle(2pt);
+\coordinate(A)at(120:2)node[above left]at(A){$\ang{120}$};
+\coordinate(B)at(200:2)node[below left]at(B){$\ang{200}$};
+\draw(O)--(A) (O)--(B);
+\contrangmark{A}{O}{B}{$y$}
+ \end{tikzpicture}
+
+\newpage
+
+\begin{tikzpicture}[domain=0:3, samples=100, very thick] % 定義域、点の数、線幅
+\draw (0,0) node[below left]{O}; % 原点、0でも、above, below, left, rightで位置指定
+  % 位置指定はanchor=north, south, east, westでも可能
+\draw[thick, ->] (-0.5,0)--(3.2,0) node[right] {$x$}; % x軸、[->]で矢印、他に[-stealth]等
+\draw[thick, ->] (0,-1.2)--(0,3.2) node[above] {$y$}; % y軸
+
+\draw plot(\x, {sqrt(\x)}) node at(1.9,1.9) {$y=\sqrt{x}$}; % atでnodeの位置指定
+\draw plot(\x, \x*\x-2*\x) node[above] {$y=x^2-2x$}; % 多項式
+\draw plot(\x, {exp(-0.5 * \x * \x)}) node[above] {$y=e^{-x^2\!/2}$}; % exp
+
+\draw [domain=0.7:3.7] plot(\x, {ln(\x)}); % y=log(x) 定義域を個別指定
+\node at(4,1) {$y=\log x$};
+
+\draw [thin, domain=-0.4:3.7] plot(\x,\x/e); % y=x/e、細線幅
+\node at(4.2,1.4){$y=\frac{x}{e}$};
+\draw [thin, domain=0.4:3.7] plot(\x, {(\x-1)/(e-1)});  % y=(x-1)/(e-1)
+\node [above, font=\scriptsize, fill=white, inner sep=0pt] % 途中で改行
+  at(0,0.4){$y=\frac{1}{e-1}(x-1)$}; % node追加設定
+
+\draw [very thin, dashed](0,1) node [left]{$1$}--(e,1)--(e,0) node[below]{$e$}; % 補助線
+\draw [very thin, dashed](1,0) node [below]{$1$}--(1,1);
+  
+\end{tikzpicture}
+
+
+
+
+\begin{tikzpicture}
+\draw [help lines] (0,0) grid (10,4);%(0,0)から(10,4)までの"細線の方眼"
+%%直線の例
+
+\draw (0,0) -- (2,1)  [rounded corners]--(2,2) -- (0,2) [sharp corners] --  (0,1)-- (1,1);
+	%点(0,0), (2,1), (2,2), (0,2), (0,1), (1,1)を結ぶ"線分"で，(2,2)と(0,2)では"滑らか"
+\draw [orange, thick] (1,2.5) -- ++(35:2cm);
+	%(1,2.5)を始点として35°の方向に2cmの"オレンジ色の太い線分"
+\draw [very thick] (0,3) rectangle (1.5,4);
+	%(0,3)を左下，(1.5,4)を右上とする"極太の長方形"
+\draw (1.5,0) -| (2.5,1.5);
+	%(2,0)と(3,1.5)をまっすぐ結ばずに"横線と縦線のみで結ぶ"
+%%円，楕円，扇形
+
+\draw [red, thick] (3,3) circle (1);
+	%(3,3)を中心とする半径1の"赤い太線の円"（古い書式で，現在は非推奨）
+\fill [green!80] (4,3) circle [x radius=1cm, y radius=5mm, rotate=30];
+	%中心(4,3)，横1cm，縦5mmの"楕円を30°傾け緑80%で塗った図形"（推奨されている新しい円の書式）
+\filldraw [fill=blue, opacity=.5, draw=Indigo] (5,0)  arc (0:45:2) --(3,0)--cycle;
+	%(5,0)を出発点に半径2の弧を0°から45°まで描き，(3,0)を経由して出発点まで線分で戻って囲んだ"透明度50%の青で塗った扇形"
+%%放物線，サインカーブ，曲線，ベジェ曲線
+
+\draw (5,4) parabola bend (7,2) (8,4);
+	%(5,4)を始点とし(7,2)を頂点とする放物線と(7,2)を頂点とし(8,4)を終点とする"放物線"
+\draw [thick] (5,1) sin (6,2) cos (7,1) sin (8,0) cos (9,1);
+	%(5,1)から始まり，(6,2)，(8,0)を頂点として(9,1)で終わる"太線のサインカーブ"
+\draw [purple, thick] (6,3) to [out=75, in=90] (8,2);
+	%(6,3)から75°の角度で出発し，90°の角度で終点(8,3)に至る"紫の太い曲線"
+\draw [purple, thin, bend right = 30] (6,3) to (8,2);
+	%2点(6,3)と(8,2)を結ぶ"右に膨らんだ紫の細い曲線"（30°の角度で始点を出発し，150°の角度で終点に至る）
+\draw [ultra thick] (8,1) .. controls (10,2) and (10,3.5) ..(9,4);
+	%始点(8,1)，終点(9,4)で方向点がそれぞれ(10,2)と(10,3)である"超極太の3次ベジェ曲線"
+\draw [->, very thin]	(8,1) -- (10,2); \draw[<-, very thin] (10,3.5) -- (9,4);
+	%上のベジェ曲線の"→つき方向線を示した細線"
+\end{tikzpicture}
+
+
+
+
+%  \begin{tikzpicture}
+%  \draw
+%  (3,-1) coordinate (A)
+%  -- (0,0) coordinate (B)
+%  -- (2,2) coordinate (C)
+%  pic["$\alpha$",draw=orange, <->, very thick, angle eccentricity=1.2, angle radius=1cm] {angle=A--B--C};
+% %線分の長さを示す例
+%  \draw (B).. controls ($(B)!.2!(C)!10pt!90:(C)$) and ($(B)!.8!(C)!10pt!90:(C)$) .. (C) node [midway, sloped, fill=white] {$a$};
+%  \draw (A).. controls ($(A)!.2!(B)!10pt!90:(B)$) and ($(A)!.8!(B)!10pt!90:(B)$) .. (B) node [midway, sloped, fill=white] {$b$};
+% \end{tikzpicture}
+
+ 
+\end{document}
